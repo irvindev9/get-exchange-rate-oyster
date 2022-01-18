@@ -39,12 +39,15 @@ class ExchangesListView (APIView):
     # Banco de México
     requestFixer = requests.get(f"http://data.fixer.io/api/latest?access_key=462f895ba54baf9898ec1935bb54af81&symbols=USD,MXN&format=1")
 
+    banxico_date = requestBanxico.json()['bmx']['series'][0]['datos'][0]['fecha'] if "datos" in requestBanxico.json() else "Sin datos"
+    banxico_value = float(requestBanxico.json()['bmx']['series'][0]['datos'][0]['dato']) if "datos" in requestBanxico.json() else "Sin datos"
+
     results = {
       "rates": {
         "provider_1": {
           "name": "Banco de México",
-          "last_updated": requestBanxico.json()['bmx']['series'][0]['datos'][0]['fecha'],
-          "value": float(requestBanxico.json()['bmx']['series'][0]['datos'][0]['dato']),
+          "last_updated": banxico_date,
+          "value": banxico_value,
         },
         "provider_2": {
           "name": "Diario Oficial de la Federación",
