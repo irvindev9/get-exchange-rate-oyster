@@ -1,16 +1,16 @@
-from django.views import View
-from django.http import JsonResponse
-from .models import Exchanges
+from rest_framework.response import Response
 from datetime import datetime
+from urllib.request import urlopen
+from rest_framework.throttling import UserRateThrottle
+from rest_framework.views import APIView
 from urllib.request import urlopen
 
 import requests
-from urllib.request import urlopen
 import re
 
+class ExchangesListView (APIView):
+  throttle_classes = [UserRateThrottle]
 
-# Create your views here.
-class ExchangesListView (View):
   def get(self, request):
     # Banco de México
     today = datetime.today().strftime('%Y-%m-%d')
@@ -25,6 +25,16 @@ class ExchangesListView (View):
     remoteUrl.readline()
     remoteUrl.readline()
     value = remoteUrl.readline().decode('utf-8')
+
+    if re.sub('[^A-Za-z0-9.]+', '', value) == 'NE':
+      remoteUrl.readline()
+      remoteUrl.readline()
+      value = remoteUrl.readline().decode('utf-8')
+
+    if re.sub('[^A-Za-z0-9.]+', '', value) == 'NE':
+      remoteUrl.readline()
+      remoteUrl.readline()
+      value = remoteUrl.readline().decode('utf-8')
 
     # Banco de México
     requestFixer = requests.get(f"http://data.fixer.io/api/latest?access_key=462f895ba54baf9898ec1935bb54af81&symbols=USD,MXN&format=1")
@@ -49,4 +59,4 @@ class ExchangesListView (View):
       }
     }
     
-    return JsonResponse(results, safe=False)
+    return Response(results)
