@@ -4,6 +4,7 @@ from urllib.request import urlopen
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from urllib.request import urlopen
+from django.http import JsonResponse
 
 import requests
 import re
@@ -12,10 +13,11 @@ class ExchangesListView (APIView):
   throttle_classes = [UserRateThrottle]
 
   def get(self, request):
+    print(request.method)
     # Banco de México
     today = datetime.today().strftime('%Y-%m-%d')
     requestBanxico = requests.get(f"https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/{today}/{today}", headers={'Bmx-Token': 'bf982f112edbe825fd6b99b4c330378ffac8ee6b8e6951dba0aad5b04c4a5779'})
-
+    print(requestBanxico.json())
     #Diario Oficial de la Federación
     remoteUrl = urlopen("https://www.banxico.org.mx/tipcamb/tipCamMIAction.do")
 
@@ -39,8 +41,8 @@ class ExchangesListView (APIView):
     # Banco de México
     requestFixer = requests.get(f"http://data.fixer.io/api/latest?access_key=462f895ba54baf9898ec1935bb54af81&symbols=USD,MXN&format=1")
 
-    banxico_date = requestBanxico.json()['bmx']['series'][0]['datos'][0]['fecha'] if "datos" in requestBanxico.json() else "Sin datos"
-    banxico_value = float(requestBanxico.json()['bmx']['series'][0]['datos'][0]['dato']) if "datos" in requestBanxico.json() else "Sin datos"
+    banxico_date = requestBanxico.json()['bmx']['series'][0]['datos'][0]['fecha'] if "datos" in requestBanxico.json()['bmx']['series'][0] else "Sin datos"
+    banxico_value = float(requestBanxico.json()['bmx']['series'][0]['datos'][0]['dato']) if "datos" in requestBanxico.json()['bmx']['series'][0] else "Sin datos"
 
     results = {
       "rates": {
