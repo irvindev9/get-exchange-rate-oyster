@@ -4,6 +4,7 @@ from urllib.request import urlopen
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from urllib.request import urlopen
+from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 
 import requests
@@ -11,13 +12,12 @@ import re
 
 class ExchangesListView (APIView):
   throttle_classes = [UserRateThrottle]
+  permission_classes = [IsAuthenticated]
 
   def get(self, request):
-    print(request.method)
     # Banco de México
     today = datetime.today().strftime('%Y-%m-%d')
     requestBanxico = requests.get(f"https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/{today}/{today}", headers={'Bmx-Token': 'bf982f112edbe825fd6b99b4c330378ffac8ee6b8e6951dba0aad5b04c4a5779'})
-    print(requestBanxico.json())
     #Diario Oficial de la Federación
     remoteUrl = urlopen("https://www.banxico.org.mx/tipcamb/tipCamMIAction.do")
 
@@ -63,5 +63,5 @@ class ExchangesListView (APIView):
         },
       }
     }
-    
+
     return Response(results)
