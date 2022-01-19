@@ -1,0 +1,4 @@
+djangorestframework
+djangorestframework_simplejwt
+Django
+requests
