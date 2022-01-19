@@ -5,6 +5,7 @@ from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from urllib.request import urlopen
 from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import render
 from django.http import JsonResponse
 
 import requests
@@ -65,3 +66,6 @@ class ExchangesListView (APIView):
     }
 
     return Response(results)
+
+def index(request):
+    return render(request, 'index.html')
